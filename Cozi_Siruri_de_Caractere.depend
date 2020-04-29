@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1588189013 source:c:\facultate\poo-tema1_gr.131_pascu_stefan-liviu_anul-i_informatica\listacirculara\cozi_siruri_de_caractere\main.cpp
+	<iostream>
+	<fstream>
+
