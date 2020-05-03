@@ -2,8 +2,6 @@
 #include <fstream>
 
 using namespace std;
-ifstream f("coada.in");
-ifstream f2("marcaj.in");
 
 class Nod {
 
@@ -12,15 +10,7 @@ private:
     Nod *next;
 
 public:
-    Nod() {
-        this->info = 0;
-        this->next = NULL;
-    }
-    Nod(int info) {
-        this->info = info;
-        this->next = NULL;
-    }
-    Nod(int info, Nod *next) {
+    Nod(int info = 0, Nod *next = NULL) {
         this->info = info;
         this->next = next;
     }
@@ -28,7 +18,7 @@ public:
         this->info = nod.info;
         this->next = nod.next;
     }
-    ~Nod() {}
+    virtual ~Nod() {}
 
     int getInfo() {
         return this->info;
@@ -49,12 +39,7 @@ class NodMarcaj : public Nod {
     NodMarcaj *next;
 
 public:
-
-    NodMarcaj(int info, int prio) : Nod(info) {
-        this->prio = prio;
-        this->next = NULL;
-    }
-    NodMarcaj(int info, int prio, NodMarcaj *next) : Nod(info) {
+    NodMarcaj(int info, int prio, NodMarcaj *next = NULL) : Nod(info) {
         this->next = next;
         this->prio = prio;
     }
@@ -81,13 +66,7 @@ protected:
     int length;
 
 public:
-    Coada() {
-        this->dimMax = 0;
-        prim = NULL;
-        ultim = NULL;
-        length = 0;
-    }
-    Coada(int dimMax) {
+    Coada(int dimMax = 0) {
         this->dimMax = dimMax;
         prim = NULL;
         ultim = NULL;
@@ -100,6 +79,7 @@ public:
         Nod *p = coada.getPrim();
         while (p != NULL) {
             insereaza(p->getInfo());
+            p = p->getNext();
         }
     }
     ~Coada() {
@@ -211,7 +191,7 @@ istream &operator >> (istream &in, Coada &aux) {
 }
 
 ostream &operator << (ostream &out, Coada &auxo) {
-    Nod *r, *prim;
+    Nod *r;
     r = auxo.prim;
 
     if (r == NULL) {
@@ -285,12 +265,7 @@ private:
     NodMarcaj *prim, *ultim;
 
 public:
-
-    DequeMarcaj() {
-        prim = NULL;
-        ultim = NULL;
-    }
-    DequeMarcaj(int dimMax) : Deque(dimMax) {
+    DequeMarcaj(int dimMax = 0) : Deque(dimMax) {
         prim = NULL;
         ultim = NULL;
     }
@@ -398,7 +373,7 @@ istream &operator >> (istream &in, DequeMarcaj &aux) {
     int dimMax, nr, prio;
     in>>dimMax;
 
-    aux = DequeMarcaj(dimMax);
+    aux.setDimMax(dimMax);
 
     while (in >> nr >> prio) {
         aux.insereaza(nr, prio);
@@ -408,7 +383,7 @@ istream &operator >> (istream &in, DequeMarcaj &aux) {
 }
 
 ostream &operator << (ostream &out, DequeMarcaj &auxo) {
-    NodMarcaj *r, *prim;
+    NodMarcaj *r;
     r = auxo.prim;
 
     if (r == NULL) {
@@ -426,6 +401,9 @@ ostream &operator << (ostream &out, DequeMarcaj &auxo) {
 
 int main()
 {
+    ifstream f("coada.in");
+    ifstream f2("marcaj.in");
+
     Coada coada = Coada(10);
     coada.insereaza(1);
     coada.insereaza(2);
