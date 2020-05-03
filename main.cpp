@@ -3,10 +3,13 @@
 
 using namespace std;
 
+
 class Nod {
 
 private:
     int info;
+
+protected:
     Nod *next;
 
 public:
@@ -36,7 +39,6 @@ public:
 
 class NodMarcaj : public Nod {
     int prio;
-    NodMarcaj *next;
 
 public:
     NodMarcaj(int info, int prio, NodMarcaj *next = NULL) : Nod(info) {
@@ -45,9 +47,9 @@ public:
     }
 
     NodMarcaj *getNext() {
-        return this->next;
+        return static_cast<NodMarcaj*>(next);
     }
-    void setNext(NodMarcaj *next) {
+    void setNext(Nod *next) {
         this->next = next;
     }
     int getPrio() {
@@ -146,6 +148,12 @@ public:
     }
     int getLength() const {
         return length;
+    }
+    void setPrim(Nod *prim) {
+        this->prim = prim;
+    }
+    void setUltim(Nod *ultim) {
+        this->ultim = ultim;
     }
     virtual Nod* getPrim() const {
         return prim;
@@ -262,49 +270,11 @@ class DequeMarcaj : public Deque {
 private:
     using Deque::insereazaInceput; /// in loc de insereazaInceput si insereazaSfarsit se va folosi insereaza(val, prio)
     using Deque::insereazaSfarsit;
-    NodMarcaj *prim, *ultim;
 
 public:
     DequeMarcaj(int dimMax = 0) : Deque(dimMax) {
         prim = NULL;
         ultim = NULL;
-    }
-
-    void stergeInceput() {
-        if (length == 0) {
-            cout<<"Coada este deja goala.\n";
-            return;
-        }
-
-        NodMarcaj *temp = prim;
-        prim = prim->getNext();
-
-        if (length == 1) {
-            ultim = NULL;
-        }
-
-        delete temp;
-
-        length--;
-    }
-
-    void stergeSfarsit() {
-        if (length == 0) {
-            cout<<"Coada este deja goala.\n";
-            return;
-        }
-
-        NodMarcaj *p = prim;
-        while(p->getNext() != ultim) {
-            p = p->getNext();
-        }
-
-        NodMarcaj *temp = ultim;
-        ultim = p;
-        ultim->setNext(NULL);
-        delete temp;
-
-        length--;
     }
 
     void insereaza(int val, int prio) {
@@ -319,32 +289,31 @@ public:
             ultim = nod;
         } else {
             // inserare in functie de prioritate
-            NodMarcaj *p = prim, *prec;
+            NodMarcaj *p = getPrim(), *prec;
             while(p != NULL && p->getPrio() > prio) {
                 prec = p;
                 p = p->getNext();
             }
 
-            if (p == prim) {
+            if (p == getPrim()) {
                 // inserare pe prima pozitie
                 nod->setNext(prim);
                 prim = nod;
-            }
-            if (p == NULL) {
+            } else if (p == NULL) {
                 // inserare pe ultima pozitie
                 this->ultim->setNext(nod);
                 ultim = nod;
+            } else {
+                nod->setNext(p);
+                prec->setNext(nod);
             }
-
-            nod->setNext(p);
-            prec->setNext(nod);
         }
 
         length++;
     }
 
     void afis() {
-        NodMarcaj *p = prim;
+        NodMarcaj *p = static_cast<NodMarcaj*>(prim);
         while (p != NULL) {
             cout<<"("<<p->getInfo()<<", "<<p->getPrio()<<")  ";
             p = p->getNext();
@@ -353,15 +322,15 @@ public:
     }
 
     NodMarcaj* getPrim() const {
-        return prim;
+        return static_cast<NodMarcaj*>(prim);
     }
     NodMarcaj* getUltim() const {
-        return ultim;
+        return static_cast<NodMarcaj*>(ultim);
     }
-    void setPrim(NodMarcaj* prim) {
+    void setPrim(Nod* prim) {
         this->prim = prim;
     }
-    void setUltim(NodMarcaj* ultim) {
+    void setUltim(Nod* ultim) {
         this->ultim = ultim;
     }
 
@@ -384,7 +353,7 @@ istream &operator >> (istream &in, DequeMarcaj &aux) {
 
 ostream &operator << (ostream &out, DequeMarcaj &auxo) {
     NodMarcaj *r;
-    r = auxo.prim;
+    r = auxo.getPrim();
 
     if (r == NULL) {
         out<<"Coada este goala.\n";
@@ -408,14 +377,16 @@ int main()
     coada.insereaza(1);
     coada.insereaza(2);
     coada.insereaza(3);
-    cout<<coada.top()<<endl;
+    cout<<"coada = "<<coada;
+    cout<<"coada.top = "<<coada.top()<<endl;
     coada.pop();
-    cout<<coada;
+    cout<<"coada = "<<coada;
     coada.goleste();
-    cout<<coada;
+    cout<<"coada = "<<coada;
     coada.pop();
 
     Coada coada2 = Coada();
+    cout<<"coada2 = "<<coada2;
     cout<<"coada si coada2 sunt egale: "<<(coada == coada2)<<endl;
 
     Deque deq = Deque(9);
@@ -424,19 +395,19 @@ int main()
     deq.insereazaInceput(3);
     deq.insereazaInceput(4);
     deq.insereazaSfarsit(5);
-    cout<<deq;
+    cout<<"deq = "<<deq;
     deq.stergeInceput();
     deq.stergeSfarsit();
-    cout<<deq;
+    cout<<"deq = "<<deq;
 
     Deque deq2 = Deque(8);
     deq2.insereazaSfarsit(3);
     deq2.insereazaSfarsit(2);
     deq2.insereazaSfarsit(13);
-    cout<<deq2;
+    cout<<"deq2 = "<<deq2;
     cout<<"deq si deq2 sunt egale: "<<(deq == deq2)<<endl;
     deq2.stergeInceput();
-    cout<<deq2;
+    cout<<"deq2 = "<<deq2;
     cout<<"deq si deq2 sunt egale: "<<(deq == deq2)<<endl;
 
     DequeMarcaj marcaj;
@@ -444,15 +415,30 @@ int main()
     marcaj.insereaza(12, 5);
     marcaj.insereaza(20, 2);
     marcaj.insereaza(3, 3);
-    cout<<marcaj;
+    cout<<"marcaj = "<<marcaj;
     marcaj.stergeSfarsit();
     marcaj.stergeInceput();
-    cout<<marcaj;
+    cout<<"marcaj = "<<marcaj;
 
     DequeMarcaj marcaj2 = DequeMarcaj(100);
     marcaj2.insereaza(12, 5);
+    cout<<"marcaj2 = "<<marcaj2;
     cout<<"marcaj si marcaj2 sunt egale: "<<(marcaj == marcaj2)<<endl;
     cout<<"coada si marcaj2 sunt egale: "<<(coada == marcaj2)<<endl;
+
+    Coada coada3 = Coada(12);
+    coada3.insereaza(1);
+    coada3.insereaza(2);
+    coada3.insereaza(3);
+    cout<<"coada3 = "<<coada3;
+
+    DequeMarcaj marcaj3 = DequeMarcaj(13);
+    marcaj3.insereaza(2,10);
+    marcaj3.insereaza(3,5);
+    marcaj3.insereaza(1,20);
+    cout<<"marcaj3 = "<<marcaj3;
+
+    cout<<"coada3 si marcaj3 sunt egale: "<<(coada3 == marcaj3)<<endl;
 
     return 0;
 }
