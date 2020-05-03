@@ -76,11 +76,11 @@ public:
     }
     Coada(const Coada &coada) {
         dimMax = coada.getDimMax();
-        length = coada.getLength();
+        length = 0;
 
         Nod *p = coada.getPrim();
         while (p != NULL) {
-            insereaza(p->getInfo());
+            insereazaSfarsit(p->getInfo());
             p = p->getNext();
         }
     }
@@ -95,7 +95,7 @@ public:
         ultim = NULL;
     }
 
-    void insereaza(int value) {
+    void insereazaSfarsit(int value) {
         if (length == dimMax) {
             cout<<"Coada este plina.\n";
             return;
@@ -116,12 +116,11 @@ public:
         return prim->getInfo();
     }
 
-    void pop() {
+    void stergeInceput() {
         if (length == 0) {
             cout<<"Coada este deja goala.\n";
             return;
         }
-
         Nod *temp = prim;
         prim = prim->getNext();
 
@@ -136,7 +135,7 @@ public:
 
     void goleste() {
         while (length > 0) {
-            pop();
+            stergeInceput();
         }
     }
 
@@ -192,7 +191,7 @@ istream &operator >> (istream &in, Coada &aux) {
     aux = Coada(dimMax);
 
     while (in >> nr) {
-        aux.insereaza(nr);
+        aux.insereazaSfarsit(nr);
     }
 
     return in;
@@ -216,18 +215,11 @@ ostream &operator << (ostream &out, Coada &auxo) {
 }
 
 class Deque : public Coada {
-private:
-protected:
-    using Coada::pop; /// in loc de pop, se vor folosi metodele stergeInceput sau stergeSfarsit
-    using Coada::insereaza;
+
 public:
 
     Deque() {}
     Deque(int dimMax) : Coada(dimMax) {}
-
-    virtual void stergeInceput() {
-        pop();
-    }
 
     virtual void stergeSfarsit() {
         if (length == 0) {
@@ -250,7 +242,7 @@ public:
 
     void insereazaInceput(int val) {
         if (length == 0) {
-            insereaza(val);
+            insereazaSfarsit(val);
             return;
         }
 
@@ -259,10 +251,6 @@ public:
         prim = nod;
 
         length++;
-    }
-
-    void insereazaSfarsit(int val) {
-        insereaza(val);
     }
 };
 
@@ -368,26 +356,36 @@ ostream &operator << (ostream &out, DequeMarcaj &auxo) {
     return out;
 }
 
+void testCoada(Coada q) {
+    cout<<"coada: "<<q;
+    cout<<"top: "<<q.top()<<endl;
+    q.stergeInceput();
+    cout<<"coada dupa stergeInceput(): "<<q;
+    q.goleste();
+    cout<<"coada dupa goleste(): "<<q;
+    cout<<endl;
+}
+
+void testDeque(Deque q) {
+    cout<<"deque: "<<q;
+    q.stergeInceput();
+    cout<<"deque dupa stergeInceput(): "<<q;
+    q.stergeSfarsit();
+    cout<<"coada dupa stergeSfarsit(): "<<q;
+    cout<<endl;
+}
+
 int main()
 {
     ifstream f("coada.in");
     ifstream f2("marcaj.in");
 
     Coada coada = Coada(10);
-    coada.insereaza(1);
-    coada.insereaza(2);
-    coada.insereaza(3);
-    cout<<"coada = "<<coada;
-    cout<<"coada.top = "<<coada.top()<<endl;
-    coada.pop();
-    cout<<"coada = "<<coada;
-    coada.goleste();
-    cout<<"coada = "<<coada;
-    coada.pop();
+    coada.insereazaSfarsit(1);
+    coada.insereazaSfarsit(2);
+    coada.insereazaSfarsit(3);
 
-    Coada coada2 = Coada();
-    cout<<"coada2 = "<<coada2;
-    cout<<"coada si coada2 sunt egale: "<<(coada == coada2)<<endl;
+    testCoada(coada);
 
     Deque deq = Deque(9);
     deq.insereazaSfarsit(13);
@@ -395,50 +393,32 @@ int main()
     deq.insereazaInceput(3);
     deq.insereazaInceput(4);
     deq.insereazaSfarsit(5);
-    cout<<"deq = "<<deq;
-    deq.stergeInceput();
-    deq.stergeSfarsit();
-    cout<<"deq = "<<deq;
 
-    Deque deq2 = Deque(8);
-    deq2.insereazaSfarsit(3);
-    deq2.insereazaSfarsit(2);
-    deq2.insereazaSfarsit(13);
-    cout<<"deq2 = "<<deq2;
-    cout<<"deq si deq2 sunt egale: "<<(deq == deq2)<<endl;
-    deq2.stergeInceput();
-    cout<<"deq2 = "<<deq2;
-    cout<<"deq si deq2 sunt egale: "<<(deq == deq2)<<endl;
+    testCoada(deq);
+    testDeque(deq);
 
     DequeMarcaj marcaj;
     f2>>marcaj;
     marcaj.insereaza(12, 5);
     marcaj.insereaza(20, 2);
     marcaj.insereaza(3, 3);
-    cout<<"marcaj = "<<marcaj;
-    marcaj.stergeSfarsit();
-    marcaj.stergeInceput();
-    cout<<"marcaj = "<<marcaj;
 
-    DequeMarcaj marcaj2 = DequeMarcaj(100);
-    marcaj2.insereaza(12, 5);
+    testCoada(marcaj);
+    testDeque(marcaj);
+
+    Coada coada2 = Coada(12);
+    coada2.insereazaSfarsit(1);
+    coada2.insereazaSfarsit(2);
+    coada2.insereazaSfarsit(3);
+    cout<<"coada2 = "<<coada2;
+
+    DequeMarcaj marcaj2 = DequeMarcaj(13);
+    marcaj2.insereaza(2,10);
+    marcaj2.insereaza(3,5);
+    marcaj2.insereaza(1,20);
     cout<<"marcaj2 = "<<marcaj2;
-    cout<<"marcaj si marcaj2 sunt egale: "<<(marcaj == marcaj2)<<endl;
-    cout<<"coada si marcaj2 sunt egale: "<<(coada == marcaj2)<<endl;
 
-    Coada coada3 = Coada(12);
-    coada3.insereaza(1);
-    coada3.insereaza(2);
-    coada3.insereaza(3);
-    cout<<"coada3 = "<<coada3;
-
-    DequeMarcaj marcaj3 = DequeMarcaj(13);
-    marcaj3.insereaza(2,10);
-    marcaj3.insereaza(3,5);
-    marcaj3.insereaza(1,20);
-    cout<<"marcaj3 = "<<marcaj3;
-
-    cout<<"coada3 si marcaj3 sunt egale: "<<(coada3 == marcaj3)<<endl;
+    cout<<"coada2 si marcaj2 sunt egale: "<<(coada2 == marcaj2)<<endl;
 
     return 0;
 }
