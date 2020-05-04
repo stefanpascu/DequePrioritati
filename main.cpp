@@ -49,7 +49,7 @@ public:
     NodMarcaj *getNext() {
         return static_cast<NodMarcaj*>(next);
     }
-    void setNext(Nod *next) {
+    void setNext(NodMarcaj *next) {
         this->next = next;
     }
     int getPrio() {
